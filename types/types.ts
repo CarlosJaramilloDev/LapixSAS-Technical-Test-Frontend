@@ -18,4 +18,8 @@ export interface StockManagerProps {
     bookId: number;
     initialStock: number;
     apiUrl: string | undefined;
-  }
+}
+
+export interface AddBookFormProps {
+    apiUrl: string | undefined;
+}

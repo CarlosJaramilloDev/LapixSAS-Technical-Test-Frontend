@@ -2,6 +2,7 @@ import { Head } from "fresh/runtime";
 import { define } from "../utils.ts";
 import { Book, HomeProps } from "../types/types.ts";
 import StockManager from "../islands/StockManager.tsx";
+import AddBookForm from "../islands/AddBookForm.tsx";
 
 function isBook(value: unknown): value is Book {
   if (typeof value !== "object" || value === null) return false;
@@ -90,8 +91,8 @@ export default function Home({ books, errorMessage, apiUrl }: HomeProps) {
           <div>
             <h1 class="text-4xl font-bold text-gray-800">Book Inventory</h1>
             <p class="text-gray-600">Manage your stock levels securely</p>
-          </div>
-          {/* Aquí irá luego el botón para añadir libro */}
+            <AddBookForm apiUrl={apiUrl} />
+          </div>  
         </div>
 
         {errorMessage && (
