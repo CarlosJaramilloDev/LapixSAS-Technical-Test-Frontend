@@ -4,6 +4,7 @@ import { Book, HomeProps } from "../types/types.ts";
 import StockManager from "../islands/StockManager.tsx";
 import AddBookForm from "../islands/AddBookForm.tsx";
 import EditBookForm from "../islands/EditBookForm.tsx";
+import DeleteBookButton from "../islands/DeleteBookButton.tsx";
 
 function isBook(value: unknown): value is Book {
   if (typeof value !== "object" || value === null) return false;
@@ -93,7 +94,7 @@ export default function Home({ books, errorMessage, apiUrl }: HomeProps) {
             <h1 class="text-4xl font-bold text-gray-800">Book Inventory</h1>
             <p class="text-gray-600">Manage your stock levels securely</p>
             <AddBookForm apiUrl={apiUrl} />
-          </div>  
+          </div>
         </div>
 
         {errorMessage && (
@@ -149,7 +150,12 @@ export default function Home({ books, errorMessage, apiUrl }: HomeProps) {
                         </td>
                         <td class="py-4 px-4 text-right">
                           <div class="inline-flex gap-2">
-                          <EditBookForm book={book} apiUrl={apiUrl} />
+                            <EditBookForm book={book} apiUrl={apiUrl} />
+                            <DeleteBookButton
+                              bookId={book.id}
+                              bookTitle={book.title}
+                              apiUrl={apiUrl}
+                            />
                           </div>
                         </td>
                       </tr>

@@ -27,4 +27,10 @@ export interface AddBookFormProps {
 export interface EditBookFormProps {
     book: Book;
     apiUrl: string | undefined;
+}
+
+export interface DeleteBookButtonProps {
+    bookId: number;
+    bookTitle: string;
+    apiUrl: string | undefined;
   }
