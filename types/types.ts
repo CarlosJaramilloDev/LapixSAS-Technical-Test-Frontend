@@ -23,3 +23,8 @@ export interface StockManagerProps {
 export interface AddBookFormProps {
     apiUrl: string | undefined;
 }
+
+export interface EditBookFormProps {
+    book: Book;
+    apiUrl: string | undefined;
+  }

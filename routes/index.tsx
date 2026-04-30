@@ -3,6 +3,7 @@ import { define } from "../utils.ts";
 import { Book, HomeProps } from "../types/types.ts";
 import StockManager from "../islands/StockManager.tsx";
 import AddBookForm from "../islands/AddBookForm.tsx";
+import EditBookForm from "../islands/EditBookForm.tsx";
 
 function isBook(value: unknown): value is Book {
   if (typeof value !== "object" || value === null) return false;
@@ -148,12 +149,7 @@ export default function Home({ books, errorMessage, apiUrl }: HomeProps) {
                         </td>
                         <td class="py-4 px-4 text-right">
                           <div class="inline-flex gap-2">
-                            <button
-                              type="button"
-                              class="text-blue-500 hover:underline"
-                            >
-                              Edit
-                            </button>
+                          <EditBookForm book={book} apiUrl={apiUrl} />
                           </div>
                         </td>
                       </tr>
