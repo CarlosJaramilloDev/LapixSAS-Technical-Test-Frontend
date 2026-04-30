@@ -2,27 +2,60 @@ import { Head } from "fresh/runtime";
 import { define } from "../utils.ts";
 import { Book, HomeProps } from "../types/types.ts";
 
+function isBook(value: unknown): value is Book {
+  if (typeof value !== "object" || value === null) return false;
+
+  const record = value as Record<string, unknown>;
+  return typeof record.id === "number" &&
+    typeof record.title === "string" &&
+    typeof record.description === "string" &&
+    typeof record.price === "number" &&
+    typeof record.stock === "number";
+}
 
 export const handler = define.handlers({
   async GET(ctx) {
     try {
-      const resp = await fetch(`${Deno.env.get("API_URL")}/books`, {
+      const apiUrl = Deno.env.get("API_URL");
+      if (!apiUrl) {
+        return ctx.render(<Home books={[]} errorMessage="API_URL is not configured." />);
+      }
+
+      const resp = await fetch(`${apiUrl}/books`, {
         headers: { "Accept": "application/json" },
       });
       
-      if (!resp.ok) return ctx.render(<Home books={[]} />);
+      if (!resp.ok) {
+        return ctx.render(
+          <Home books={[]} errorMessage={`Could not load books (HTTP ${resp.status}).`} />,
+        );
+      }
       
-      const books: Book[] = await resp.json();
-      return ctx.render(<Home books={books} />);
+      const payload: unknown = await resp.json();
+      if (!Array.isArray(payload)) {
+        return ctx.render(<Home books={[]} errorMessage="Invalid data format from API." />);
+      }
+
+      const books = payload.filter(isBook);
+      const hasInvalidItems = books.length !== payload.length;
+
+      return ctx.render(
+        <Home
+          books={books}
+          errorMessage={hasInvalidItems
+            ? "Some items were ignored because they have an invalid format."
+            : undefined}
+        />,
+      );
     } catch (err) {
       console.error("Error fetching books:", err);
-      return ctx.render(<Home books={[]} />);
+      return ctx.render(<Home books={[]} errorMessage="Unexpected error while loading books." />);
     }
   },
 });
 
 
-export default function Home({ books }: HomeProps) {
+export default function Home({ books, errorMessage }: HomeProps) {
   return (
     <div class="px-4 py-8 mx-auto bg-gray-50 min-h-screen">
       <Head>
@@ -37,6 +70,12 @@ export default function Home({ books }: HomeProps) {
           </div>
           {/* Aquí irá luego el botón para añadir libro */}
         </div>
+
+        {errorMessage && (
+          <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {errorMessage}
+          </div>
+        )}
 
         <div class="grid gap-6 shadow-sm bg-white p-6 rounded-xl border border-gray-100">
           {books.length > 0 ? (

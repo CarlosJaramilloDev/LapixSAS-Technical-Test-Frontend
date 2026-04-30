@@ -10,4 +10,5 @@ export interface Book {
 
 export interface HomeProps {
     books: Book[];
+    errorMessage?: string;
 }
