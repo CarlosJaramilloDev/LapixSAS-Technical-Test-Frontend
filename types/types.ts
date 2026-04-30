@@ -10,5 +10,12 @@ export interface Book {
 
 export interface HomeProps {
     books: Book[];
+    apiUrl: string | undefined;
     errorMessage?: string;
 }
+
+export interface StockManagerProps {
+    bookId: number;
+    initialStock: number;
+    apiUrl: string | undefined;
+  }

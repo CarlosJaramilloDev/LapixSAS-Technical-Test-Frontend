@@ -1,6 +1,7 @@
 import { Head } from "fresh/runtime";
 import { define } from "../utils.ts";
 import { Book, HomeProps } from "../types/types.ts";
+import StockManager from "../islands/StockManager.tsx";
 
 function isBook(value: unknown): value is Book {
   if (typeof value !== "object" || value === null) return false;
@@ -18,22 +19,38 @@ export const handler = define.handlers({
     try {
       const apiUrl = Deno.env.get("API_URL");
       if (!apiUrl) {
-        return ctx.render(<Home books={[]} errorMessage="API_URL is not configured." />);
+        return ctx.render(
+          <Home
+            books={[]}
+            errorMessage="API_URL is not configured."
+            apiUrl={undefined}
+          />,
+        );
       }
 
       const resp = await fetch(`${apiUrl}/books`, {
         headers: { "Accept": "application/json" },
       });
-      
+
       if (!resp.ok) {
         return ctx.render(
-          <Home books={[]} errorMessage={`Could not load books (HTTP ${resp.status}).`} />,
+          <Home
+            books={[]}
+            errorMessage={`Could not load books (HTTP ${resp.status}).`}
+            apiUrl={apiUrl}
+          />,
         );
       }
-      
+
       const payload: unknown = await resp.json();
       if (!Array.isArray(payload)) {
-        return ctx.render(<Home books={[]} errorMessage="Invalid data format from API." />);
+        return ctx.render(
+          <Home
+            books={[]}
+            errorMessage="Invalid data format from API."
+            apiUrl={apiUrl}
+          />,
+        );
       }
 
       const books = payload.filter(isBook);
@@ -45,17 +62,23 @@ export const handler = define.handlers({
           errorMessage={hasInvalidItems
             ? "Some items were ignored because they have an invalid format."
             : undefined}
+          apiUrl={apiUrl}
         />,
       );
     } catch (err) {
       console.error("Error fetching books:", err);
-      return ctx.render(<Home books={[]} errorMessage="Unexpected error while loading books." />);
+      return ctx.render(
+        <Home
+          books={[]}
+          errorMessage="Unexpected error while loading books."
+          apiUrl={undefined}
+        />,
+      );
     }
   },
 });
 
-
-export default function Home({ books, errorMessage }: HomeProps) {
+export default function Home({ books, errorMessage, apiUrl }: HomeProps) {
   return (
     <div class="px-4 py-8 mx-auto bg-gray-50 min-h-screen">
       <Head>
@@ -78,46 +101,71 @@ export default function Home({ books, errorMessage }: HomeProps) {
         )}
 
         <div class="grid gap-6 shadow-sm bg-white p-6 rounded-xl border border-gray-100">
-          {books.length > 0 ? (
-            <div class="overflow-x-auto">
-              <table class="w-full text-left border-collapse">
-                <thead>
-                  <tr class="border-b border-gray-100">
-                    <th class="py-3 px-4 font-semibold text-gray-700">Book Details</th>
-                    <th class="py-3 px-4 font-semibold text-gray-700 text-center">Price</th>
-                    <th class="py-3 px-4 font-semibold text-gray-700 text-center">Current Stock</th>
-                    <th class="py-3 px-4 font-semibold text-gray-700 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {books.map((book) => (
-                    <tr key={book.id} class="border-b border-gray-50 hover:bg-gray-50 transition">
-                      <td class="py-4 px-4">
-                        <div class="font-bold text-gray-800">{book.title}</div>
-                        <div class="text-sm text-gray-500">{book.description}</div>
-                      </td>
-                      <td class="py-4 px-4 text-center font-mono text-green-600 font-semibold">
-                        ${book.price}
-                      </td>
-                      <td class="py-4 px-4 text-center font-bold text-lg">
-                        {book.stock}
-                      </td>
-                      <td class="py-4 px-4 text-right">
-                        {/* Aquí insertaremos nuestra Isla de Stock pronto */}
-                        <div class="inline-flex gap-2">
-                           <button type="button" class="text-blue-500 hover:underline">Edit</button>
-                        </div>
-                      </td>
+          {books.length > 0
+            ? (
+              <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                  <thead>
+                    <tr class="border-b border-gray-100">
+                      <th class="py-3 px-4 font-semibold text-gray-700">
+                        Book Details
+                      </th>
+                      <th class="py-3 px-4 font-semibold text-gray-700 text-center">
+                        Price
+                      </th>
+                      <th class="py-3 px-4 font-semibold text-gray-700 text-right">
+                        Stock
+                      </th>
+                      <th class="py-3 px-4 font-semibold text-gray-700 text-right">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div class="text-center py-20 text-gray-400">
-              <p>No books available in the database.</p>
-            </div>
-          )}
+                  </thead>
+                  <tbody>
+                    {books.map((book) => (
+                      <tr
+                        key={book.id}
+                        class="border-b border-gray-50 hover:bg-gray-50 transition"
+                      >
+                        <td class="py-4 px-4">
+                          <div class="font-bold text-gray-800">
+                            {book.title}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            {book.description}
+                          </div>
+                        </td>
+                        <td class="py-4 px-4 text-center font-mono text-green-600 font-semibold">
+                          ${book.price}
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                          <StockManager
+                            bookId={book.id}
+                            initialStock={book.stock}
+                            apiUrl={apiUrl}
+                          />
+                        </td>
+                        <td class="py-4 px-4 text-right">
+                          <div class="inline-flex gap-2">
+                            <button
+                              type="button"
+                              class="text-blue-500 hover:underline"
+                            >
+                              Edit
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+            : (
+              <div class="text-center py-20 text-gray-400">
+                <p>No books available in the database.</p>
+              </div>
+            )}
         </div>
       </div>
     </div>
