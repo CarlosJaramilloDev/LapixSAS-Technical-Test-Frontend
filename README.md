@@ -1,4 +1,4 @@
-# Fresh project
+# Book Inventory Frontend
 
 ## AI-assisted development disclosure
 
@@ -11,18 +11,59 @@ Human judgment remained responsible for reviewing suggestions, integrating chang
 
 ---
 
-Your new Fresh project is ready to go. You can follow the Fresh "Getting
-Started" guide here: https://fresh.deno.dev/docs/getting-started
+A Fresh frontend app for managing the Book Inventory UI.
 
-### Usage
+## Stack
 
-Make sure to install Deno:
-https://docs.deno.com/runtime/getting_started/installation
+- Deno
+- Fresh
+- Preact (`islands` for interactive components)
+- Tailwind CSS (utility classes in UI)
 
-Then start the project in development mode:
+## Prerequisites
 
+Before running this frontend, make sure:
+
+- Deno is installed: [https://docs.deno.com/runtime/getting_started/installation](https://docs.deno.com/runtime/getting_started/installation)
+- The backend API is up and running (Laravel app)
+
+Default backend URL expected by the frontend:
+
+- `http://127.0.0.1:8000/api`
+
+## Installation
+
+1. Go to the frontend project folder.
+2. Create your environment file:
+
+```bash
+cp .env.example .env
 ```
+
+If `.env.example` is not present, create `.env` manually.
+
+3. Set the API URL:
+
+```env
+API_URL=http://127.0.0.1:8000/api
+```
+
+4. Start development server:
+
+```bash
 deno task dev
 ```
 
-This will watch the project directory and restart as necessary.
+## Change API URL
+
+To point the frontend to another backend host/port, update:
+
+- `.env` -> `API_URL`
+
+Example:
+
+```env
+API_URL=http://localhost:9000/api
+```
+
+Then restart the dev server so the new value is picked up.
