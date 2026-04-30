@@ -17,7 +17,7 @@ export default function AddBookForm({ apiUrl }: AddBookFormProps) {
     const data = {
       title: formData.get("title"),
       description: formData.get("description"),
-      price: parseFloat(formData.get("price") as string),
+      price: parseInt(formData.get("price") as string),
       stock: parseInt(formData.get("stock") as string),
     };
 
@@ -78,7 +78,7 @@ export default function AddBookForm({ apiUrl }: AddBookFormProps) {
               <div class="grid grid-cols-2 gap-4">
                 <div>
                   <label class="block text-sm font-medium text-gray-700">Price ($)</label>
-                  <input name="price" type="number" step="0.01" required class="w-full border rounded-lg px-3 py-2 mt-1" />
+                  <input name="price" type="number" step="1" required class="w-full border rounded-lg px-3 py-2 mt-1" />
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-gray-700">Initial Stock</label>

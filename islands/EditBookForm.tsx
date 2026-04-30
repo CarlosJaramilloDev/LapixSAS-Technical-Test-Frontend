@@ -17,7 +17,7 @@ export default function EditBookForm({ book, apiUrl }: EditBookFormProps) {
     const data = {
       title: formData.get("title"),
       description: formData.get("description"),
-      price: parseFloat(formData.get("price") as string),
+      price: parseInt(formData.get("price") as string),
     };
 
     try {
@@ -25,7 +25,7 @@ export default function EditBookForm({ book, apiUrl }: EditBookFormProps) {
         throw new Error("API URL is not configured.");
       }
       const resp = await fetch(`${apiUrl}/books/${book.id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           "Accept": "application/json",
@@ -90,7 +90,7 @@ export default function EditBookForm({ book, apiUrl }: EditBookFormProps) {
                 <input 
                   name="price" 
                   type="number" 
-                  step="0.01" 
+                  step="1" 
                   required 
                   defaultValue={book.price.toString()}
                   class="w-full border rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-blue-500 outline-none" 
